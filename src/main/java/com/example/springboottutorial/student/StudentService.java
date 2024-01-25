@@ -1,11 +1,9 @@
 package com.example.springboottutorial.student;
 
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentService {
@@ -17,18 +15,22 @@ public class StudentService {
     }
 
     public List<Student> getStudents() {
-//        return List.of(
-//                new Student(1L,
-//                        "Son Tran",
-//                        "son.tranngoc@gmail.com",
-//                        LocalDate.of(1981, Month.OCTOBER, 20),
-//                        45),
-//                new Student(2L,
-//                        "Su Lam",
-//                        "sulam@gmail.com",
-//                        LocalDate.of(2013, Month.FEBRUARY, 16),
-//                        11)
-//        );
         return studentRepository.findAll();
+    }
+
+    public void addNewStudent(Student student) {
+        Optional<Student> studentOptional = studentRepository.findStudentByEmail(student.getEmail());
+        if (studentOptional.isPresent()) {
+            throw new IllegalStateException("email taken");
+        }
+        studentRepository.save(student);
+    }
+
+    public void deleteStudent(Long studentId) {
+        boolean exists = studentRepository.existsById(studentId);
+        if (!exists) {
+            throw new IllegalStateException("student with id " + studentId + " does not exists");
+        }
+        studentRepository.deleteById(studentId);
     }
 }
